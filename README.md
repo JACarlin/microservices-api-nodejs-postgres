@@ -38,7 +38,7 @@ Sigue estos pasos para levantar el proyecto en tu entorno local.
 
 1.  **Clona el repositorio:**
     ```bash
-    git clone [https://github.com/tu-usuario/tu-repositorio.git](https://github.com/tu-usuario/tu-repositorio.git)
+    git clone [https://github.com/JACarlin/microservices-api-nodejs-postgres.git](https://github.com/JACarlin/microservices-api-nodejs-postgres.git)
     cd tu-repositorio
     ```
 
