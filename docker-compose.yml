@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # Servicio de Base de Datos PostgreSQL
+  postgres:
+    image: postgres:14-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - '5432:5432' # Exponer a localhost para poder conectarte con un cliente de DB
+    volumes:
+      - ./db-init:/docker-entrypoint-initdb.d # Ejecuta scripts .sql al iniciar
+      - postgres_data:/var/lib/postgresql/data
+
+  # Servicio de Autenticación
+  auth-service:
+    build: ./servicio-auth
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - '3001:3000'
+    environment:
+      - PORT=3000
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+
+  # Servicio de Gestión de Usuarios
+  users-service:
+    build: ./servicio-usuarios
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - '3002:3000'
+    environment:
+      - PORT=3000
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      - JWT_SECRET=${JWT_SECRET} # Necesario para validar roles
+
+  # Servicio de Gestión de Reportes
+  reports-service:
+    build: ./servicio-reportes
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - '3003:3000'
+    environment:
+      - PORT=3000
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+
+  # API Gateway: La única puerta de entrada
+  api-gateway:
+    build: ./api-gateway
+    restart: always
+    depends_on:
+      - auth-service
+      - users-service
+      - reports-service
+    ports:
+      - '3000:3000' # Este es el único puerto que expondremos con Ngrok
+    environment:
+      - PORT=3000
+      - AUTH_SERVICE_URL=http://auth-service:3000
+      - USERS_SERVICE_URL=http://users-service:3000
+      - REPORTS_SERVICE_URL=http://reports-service:3000
+
+volumes:
+  postgres_data:
