@@ -38,8 +38,8 @@ Sigue estos pasos para levantar el proyecto en tu entorno local.
 
 1.  **Clona el repositorio:**
     ```bash
-    git clone [https://github.com/JACarlin/microservices-api-nodejs-postgres.git](https://github.com/JACarlin/microservices-api-nodejs-postgres.git)
-    cd tu-repositorio
+    git clone https://github.com/JACarlin/microservices-api-nodejs-postgres.git
+    cd microservices-api-nodejs-postgres
     ```
 
 2.  **Configura las variables de entorno:**
